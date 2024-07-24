@@ -18,21 +18,21 @@ class CurrencyExchangerServiceTest {
     private final CurrencyExchangerService currencyExchangerService =
             new CurrencyExchangerService(fetchCurrencyDataService);
 
-    private static final String CURRENCY = "CURRENCY";
-    private static final String EXCHANGE_CURRENCY = "EXCHANGE_CURRENCY";
-    private static final BigDecimal AMOUNT = BigDecimal.ONE;
+    private final String currency = "CURRENCY";
+    private final String exchangeCurrency = "EXCHANGE_CURRENCY";
+    private final BigDecimal amount = BigDecimal.ONE;
 
     @Test
     public void exchangeCurrencyShouldReturn() throws FetchCurrencyDataServiceException {
         BigDecimal exchangeRate = BigDecimal.TEN;
-        when(fetchCurrencyDataService.fetchCurrencyExchangeRate(CURRENCY, EXCHANGE_CURRENCY)).thenReturn(exchangeRate);
+        when(fetchCurrencyDataService.fetchCurrencyExchangeRate(currency, exchangeCurrency)).thenReturn(exchangeRate);
 
         ExchangedCurrencyResponse response = currencyExchangerService.exchangeCurrency(
-                CURRENCY, EXCHANGE_CURRENCY, AMOUNT
+                currency, exchangeCurrency, amount
         );
 
         ExchangedCurrencyResponse expectedResponse = new ExchangedCurrencyResponse(
-                CURRENCY, EXCHANGE_CURRENCY, AMOUNT, exchangeRate, AMOUNT.multiply(exchangeRate)
+                currency, exchangeCurrency, amount, exchangeRate, amount.multiply(exchangeRate)
         );
         assertEquals(expectedResponse, response);
     }
@@ -40,11 +40,11 @@ class CurrencyExchangerServiceTest {
     @Test
     public void exchangeCurrencyShouldThrowFetchCurrencyDataServiceException()
             throws FetchCurrencyDataServiceException {
-        when(fetchCurrencyDataService.fetchCurrencyExchangeRate(CURRENCY, EXCHANGE_CURRENCY))
+        when(fetchCurrencyDataService.fetchCurrencyExchangeRate(currency, exchangeCurrency))
                 .thenThrow(FetchCurrencyDataServiceException.class);
         assertThrows(
                 FetchCurrencyDataServiceException.class,
-                () -> currencyExchangerService.exchangeCurrency(CURRENCY, EXCHANGE_CURRENCY, AMOUNT)
+                () -> currencyExchangerService.exchangeCurrency(currency, exchangeCurrency, amount)
         );
 
     }

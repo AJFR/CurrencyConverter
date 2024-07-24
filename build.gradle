@@ -16,19 +16,21 @@ java {
 
 sourceSets {
 	integrationTest {
-		java {
 			compileClasspath += main.output + test.output
 			runtimeClasspath += main.output + test.output
-			srcDir file('src/integrationTest/java')
-		}
-		resources.srcDir file('src/integrationTest/resources')
 	}
+}
+
+configurations {
+	integrationTestImplementation.extendsFrom implementation
+	integrationTestImplementation.extendsFrom testImplementation
+	integrationTestRuntimeOnly.extendsFrom runtimeOnly
 }
 
 idea {
 	module {
 		testSources.from(file('src/integrationTest/java'))
-		testSources.from(file('src/integrationTest/java/resources'))
+		testResources.from(file('src/integrationTest/resources'))
 	}
 }
 
@@ -53,6 +55,28 @@ dependencies {
 
 }
 
+tasks.register('integrationTest', Test) {
+	description = 'Runs integration tests.'
+	group = 'verification'
+
+	testClassesDirs = sourceSets.integrationTest.output.classesDirs
+	classpath = sourceSets.integrationTest.runtimeClasspath
+	shouldRunAfter test
+
+	useJUnitPlatform()
+
+	testLogging {
+		events "passed"
+	}
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+tasks.named('integrationTest') {
+	useJUnitPlatform()
+}
+
+//check.dependsOn integrationTest
+

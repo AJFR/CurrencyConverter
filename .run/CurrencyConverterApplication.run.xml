@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="CurrencyConverterApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="CurrencyConverter.main" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.ajfr.currency.converter.CurrencyConverterApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
