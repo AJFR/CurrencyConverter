@@ -1,12 +1,15 @@
 package com.ajfr.currency.converter.exception;
 
+import lombok.Getter;
+import org.springframework.http.HttpStatusCode;
+
+@Getter
 public class FetchCurrencyDataServiceException extends Exception {
 
-    public FetchCurrencyDataServiceException(Exception e) {
-        super(e);
-    }
+    private final HttpStatusCode httpStatusCode;
 
-    public FetchCurrencyDataServiceException(String error) {
+    public FetchCurrencyDataServiceException(String error, HttpStatusCode httpStatusCode) {
         super(error);
+        this.httpStatusCode = httpStatusCode;
     }
 }

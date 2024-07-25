@@ -5,9 +5,11 @@ import com.ajfr.currency.converter.exception.FetchCurrencyDataServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -35,7 +37,8 @@ public class FetchCurrencyDataService {
         this.apiKey = apiKey;
     }
 
-    public Map<String, BigDecimal> fetchCurrencyExchangeRates(String currencyCode) throws FetchCurrencyDataServiceException {
+    public Map<String, BigDecimal> fetchCurrencyExchangeRates(String currencyCode)
+            throws FetchCurrencyDataServiceException {
         return getExchangeRates(currencyCode);
     }
 
@@ -43,25 +46,32 @@ public class FetchCurrencyDataService {
             throws FetchCurrencyDataServiceException {
         Map<String, BigDecimal> exchangeRates = getExchangeRates(currencyCode);
         if (!exchangeRates.containsKey(exchangeCode)) {
-            throw new FetchCurrencyDataServiceException("No exchange data for " + currencyCode + "/" + exchangeCode);
+            throw new FetchCurrencyDataServiceException(
+                    "No exchange data for " + currencyCode + "/" + exchangeCode + ".", HttpStatus.NOT_FOUND
+            );
         }
-        return getExchangeRates(currencyCode).get(exchangeCode);
+        return exchangeRates.get(exchangeCode);
     }
 
     private Map<String, BigDecimal> getExchangeRates(String currencyCode) throws FetchCurrencyDataServiceException {
         try {
             URI uri = UriComponentsBuilder.fromUriString(urlTemplate)
                     .build(apiKey, currencyCode);
-            CurrencyExchangeResponse response = restTemplate.exchange(
-                    uri, GET, new RequestEntity<Void>(GET, uri), CurrencyExchangeResponse.class
-                    ).getBody();
-            if (response == null) {
-                throw new FetchCurrencyDataServiceException("Response is null.");
+                ResponseEntity<CurrencyExchangeResponse> response = restTemplate.exchange(
+                        uri, GET, new RequestEntity<Void>(GET, uri), CurrencyExchangeResponse.class
+                        );
+            if (response.getBody() == null) {
+                throw new FetchCurrencyDataServiceException(
+                        "Response is null for currency: " + currencyCode + ".", HttpStatus.INTERNAL_SERVER_ERROR
+                );
             }
-            return response.conversion_rates();
-        } catch (RestClientException e) {
-            log.error("Error: {}", e.getMessage());
-            throw new FetchCurrencyDataServiceException(e);
+            return response.getBody()
+                    .conversion_rates();
+        } catch (HttpStatusCodeException e) {
+            log.error("Error: {}.", e.getMessage());
+            throw new FetchCurrencyDataServiceException(
+                    "Unable to find currency: " + currencyCode + ".", e.getStatusCode()
+            );
         }
     }
 }

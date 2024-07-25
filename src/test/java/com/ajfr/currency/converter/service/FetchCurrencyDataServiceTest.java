@@ -7,7 +7,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -62,7 +62,7 @@ class FetchCurrencyDataServiceTest {
     public void fetchCurrencyExchangeRatesShouldThrowWhenResponseIsNotOK() {
         when(restTemplate.exchange(
                 uri, HttpMethod.GET, new RequestEntity<Void>(GET, uri), CurrencyExchangeResponse.class
-        )).thenThrow(RestClientException.class);
+        )).thenThrow(HttpClientErrorException.class);
 
         assertThrows(FetchCurrencyDataServiceException.class, () ->
                 fetchCurrencyDataService.fetchCurrencyExchangeRates(currency)
