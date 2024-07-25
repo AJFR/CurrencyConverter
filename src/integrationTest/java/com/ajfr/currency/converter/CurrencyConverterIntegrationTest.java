@@ -66,7 +66,7 @@ class CurrencyConverterIntegrationTest {
         this.mockMvc = MockMvcBuilders.standaloneSetup(currencyConverterRestController)
                 .setControllerAdvice(currencyConverterExceptionHandler)
                 .build();
-        mockServer = MockRestServiceServer.createServer(restTemplate);;
+        mockServer = MockRestServiceServer.createServer(restTemplate);
     }
 
     @Test

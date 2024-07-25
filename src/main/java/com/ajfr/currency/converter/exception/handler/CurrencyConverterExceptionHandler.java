@@ -23,7 +23,7 @@ public class CurrencyConverterExceptionHandler {
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ConstraintViolationException.class)
-    public ErrorResponse constraintViolationException(ConstraintViolationException e) throws IOException {
+    public ErrorResponse constraintViolationException(ConstraintViolationException e) {
         return new ErrorResponse(e.getMessage());
     }
 
